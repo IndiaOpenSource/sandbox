@@ -23,7 +23,10 @@
 ?>
 <div class="line-item-summary">
   <div class="line-item-quantity">
-    <?php print '<img src="' . path_to_theme() . '/images/picto_cart.png"/>'; ?><span class="line-item-quantity-raw"><?php print "({$quantity_raw})"; ?></span>
+    <span class="cart-image"></span>
+      <?php if ($quantity_raw): ?>
+         <span class="line-item-quantity-raw"><?php print "({$quantity_raw})"; ?></span>
+      <?php endif; ?>
   </div>
   <?php print $links; ?>
 </div>
