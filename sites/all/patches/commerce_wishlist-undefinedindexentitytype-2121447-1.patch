@@ -1,0 +1,13 @@
+diff --git a/commerce_wishlist.module b/commerce_wishlist.module
+index 82bf6b2..3c2dba4 100644
+--- a/commerce_wishlist.module
++++ b/commerce_wishlist.module
+@@ -363,7 +363,7 @@ function _commerce_wishlist_link($uid) {
+  */
+ function _commerce_wishlist_get_context_entity_id($context) {
+   // TODO: What if it's not a node?
+-  if ($context['entity_type'] == 'node') {
++  if (isset($context['entity_type']) && $context['entity_type'] == 'node') {
+     if (isset($context['entity'])) {
+       return $context['entity']->nid;
+     }
