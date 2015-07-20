@@ -209,6 +209,8 @@ function commerce_payumoney_transaction($order, $payment_method, $status, $txnid
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
   $currency = $wrapper->commerce_order_total->currency_code->value();
   $amount = $wrapper->commerce_order_total->amount->value();
+
+  $transaction = commerce_payment_transaction_new();
   $transaction->instance_id = $payment_method['instance_id'];
   $transaction->amount = $amount;
   $transaction->currency_code = $currency;

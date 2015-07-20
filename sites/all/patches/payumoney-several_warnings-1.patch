@@ -1,0 +1,53 @@
+diff --git a/sites/all/modules/contrib/payumoney/commerce_payumoney.module b/sites/all/modules/contrib/payumoney/commerce_payumoney.module
+index 7c824d4..f5288dc 100644
+--- a/sites/all/modules/contrib/payumoney/commerce_payumoney.module
++++ b/sites/all/modules/contrib/payumoney/commerce_payumoney.module
+@@ -209,6 +209,8 @@ function commerce_payumoney_transaction($order, $payment_method, $status, $txnid
+   $wrapper = entity_metadata_wrapper('commerce_order', $order);
+   $currency = $wrapper->commerce_order_total->currency_code->value();
+   $amount = $wrapper->commerce_order_total->amount->value();
++
++  $transaction = commerce_payment_transaction_new();
+   $transaction->instance_id = $payment_method['instance_id'];
+   $transaction->amount = $amount;
+   $transaction->currency_code = $currency;
+diff --git a/sites/all/modules/contrib/payumoney/modules/pmphone/commerce_payumoney_pmphone.module b/sites/all/modules/contrib/payumoney/modules/pmphone/commerce_payumoney_pmphone.module
+index ec99213..16b1d18 100644
+--- a/sites/all/modules/contrib/payumoney/modules/pmphone/commerce_payumoney_pmphone.module
++++ b/sites/all/modules/contrib/payumoney/modules/pmphone/commerce_payumoney_pmphone.module
+@@ -21,7 +21,9 @@ function commerce_payumoney_pmphone_field_attach_presave($entity_type, $entity)
+   $addressfields = commerce_payumoney_pmphone_addressfield_types();
+   foreach ($addressfields as $field_name) {
+     if (isset($entity->$field_name)) {
+-      $default_fields = array_keys(addressfield_default_values());
++      $field = field_info_field('commerce_customer_address');
++      $instance = field_info_instance('commerce_customer_profile', 'commerce_customer_address', $field_name);
++      $default_fields = array_keys(addressfield_default_values($field, $instance));
+       $default_fields[] = 'element_key';
+       foreach ($entity->$field_name as $lang_code => $fields) {
+         foreach ($fields as $delta => $fieldset) {
+@@ -62,13 +64,17 @@ function commerce_payumoney_pmphone_field_attach_load($entity_type, $entities, $
+       }
+       foreach ($entity->$field_name as $lang_code => $fields) {
+         foreach ($fields as $delta => $fieldset) {
+-          if (!empty($fieldset['data'])) {
+-            // Unserialize data, else skip if string.
+-            if (($data = unserialize($fieldset['data'])) && is_array($data)) {
+-              // Store unserialized data values in additional fields.
+-              $phone_data = array_intersect_key($data, $phone_elements);
+-              $entity->{$field_name}[$lang_code][$delta] = array_merge($fieldset, $phone_data);
+-            }
++          // Fill default values for pre-pm_phone addresses to keep
++          // Commerce Order from duplicating address.
++          if (empty($fieldset['data'])) {
++            $fieldset['data'] = serialize(array_fill_keys($phone_elements, ''));
++          }
++
++          // Unserialize data, else skip if string
++          if (($data = unserialize($fieldset['data'])) && is_array($data)) {
++            // Store unserialized data values in additional fields
++            $phone_data = array_intersect_key($data, $phone_elements);
++            $entity->{$field_name}[$lang_code][$delta] = array_merge($fieldset, $phone_data);
+           }
+         }
+       }
