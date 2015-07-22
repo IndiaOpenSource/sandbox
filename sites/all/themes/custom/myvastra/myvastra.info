@@ -2,7 +2,7 @@ name = My Vastra
 description = A free Bootstrap-based, responsive Drupal theme by <a href="http://www.morethanthemes.com/" target="_blank">More than (just) Themes</a>.
 version = @VERSION@
 core = 7.x
-base theme = startupgrowth_lite
+;base theme = startupgrowth_lite
 
 stylesheets[all][] = style.css
 stylesheets[all][] = custom.css
